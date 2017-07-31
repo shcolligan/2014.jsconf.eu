@@ -60,15 +60,44 @@ And so, this is what I want to share with you today. Hopefully this will be usef
 
 So, if we look at the JavaScript runtime itself-- like v8, for example, which is the runtime inside Chrome-- this is a simplified view of what the JavaScript runtime is. It's a heap, which is really boring, we don't need to worry about that, it's where memory allocation happens; and then there's the call stack, which is where your stack frames are and all that kind of stuff. But, if you, like, clone the v8 code base, and grep for things like setTimeout or DOM or XMLHttpRequest, they're not in there. They don't exist in v8. Which was kinda of a surprise to me, right? Like, setTimeout is one of those first things you use when you start thinking about async stuff. And it's not in the V8 source??? Hmm ... interesting. 
 
-[3:29. Slide: Same JS rectangle, now inside larger rectangle labeled with Chrome icon, and joined now by things labeled WebAPIs, Event Loop, and Callback Queue.]
+[3:29. Slide: Same JS rectangle, now inside larger rectangle labeled with Chrome icon, and joined now by things labeled WebAPIs, Event Loop, and Callback Queue. Under "WebAPIs" are three rectangles labeled "DOM (document), "ajax (XMLHttpRequest)", "setTimeout".]
 
-So, over this 18 months of discovery I come to realize this is really, this is really the bigger picture, this is what I'm hoping to get you on board with today and understand what these pieces are, we have the V8 Runtime but then we have these things called web APIs which are extra things that the browser provides. DOM, AJAX, time out, things like that, we have this mythical event loop and the callback queue. I'm sure you've heard some of these terms before, but maybe you don't quite understand how these pieces pull together. So, I'm going to start from the beginning, some of this will be new, to words might be new to people, other people will get this. We're going to quickly move on from here, bear with me if this is obvious, I think for a lot of people it's not. 
+So, over this 18 months of discovery, I've come to realize this is really the bigger picture. This is what I'm hoping to get you all kind of on board with today, and understand what these pieces are. So, we have the v8 runtime, but then we have these things called WebAPIs, which are extra things that the browser provides. DOM, ajax, timeout, things like that. We have this mythical event loop, and the callback queue. I'm sure you've heard some of these terms before, but maybe you don't quite understand how these pieces pull together. 
 
-So, JavaScript is a single threaded programming language, single threaded Runtime, it has a single call stack. And it can do one thing at a time, that's what a single thread means, the program can run one piece of code at a time. So, let's try and visualize that just to get our heads around what that mean, so if I have some code like this on your left, we've got a few functions, a function "multiplier" which multiplies two numbers, "square" which calls "multiply" with the same number twice, a function which prints the square of a number of calling square and then calling console.log and then at the bottom of our file we actually run print square, this code all good?  Make sense?  Cool. 
+[4:03. Slide: "the call stack. one thread == One Call Stack == one thing at a time."]
 
-So, if we run this, well, I should back up a step, so the call stack is basically ‑‑ it's a data structure which records basically where in the program we are, if we step into a function, we put something on to the stack, if we return from a function, we pop off the top of the stack, that's all the stack can do, ‑‑ 
+So, I'm going to start from the beginning. Some of this will be new, or, the words might be new, to people. Other people might get this, but we're going to quickly move on from here, so bear with me if this is obvious. But I think for a lot of people it's not. 
 
-so if you run this file, there's kind of a main function, right, like the file itself, so, we push that on to the stack. Then we have some function definitions, they're just, like, defining the state of the world, and finally we got to print square, right, so print square is a function call, so we push that on to the stack, and immediately inside print square, push on to the stack, which calls multiply, now we have a return statement, we multiply A and B and we return, when we return we pop something off the stack, so, pop, multiplier of the stack, returning to square, return to print square, console.log, there's no return, it's implicit, because we got to the end of the function, and we're done so that's like a visualization of the call stalk, does that make sense?  (Yes, Phil) 
+So, JavaScript is a single threaded programming language, single threaded runtime, it has a single call stack. And it can do one thing at a time. That's what a single thread means: the program can run one piece of code at a time. 
+
+[4:31. Slide titled "Call Stack", with code for three simple functions and one function call on the left, and an empty rectangle labeled "stack" on the right.]
+
+function multiply(a,b){
+  return a * b;
+}
+
+function square(n){
+  return multiply(n);
+}
+
+function printSquare(n){
+  var squared = square(n);
+  console.log(squared);
+}
+
+printSquare(4);
+
+So, let's try and visualize that, just to get our heads around what that means. So, if I have some code like this on your left, we've got a few functions. A function "multiply" which multiplies two numbers, "square" which calls "multiply" with the same number twice, a function ["printSquare"] which prints the square of a number of calling square and then calling console.log, and then at the bottom of our file, we actually run printSquare. This code all good?  Make sense?  Cool. 
+
+[4:58. Slide. An arrow now points to the first function, "multiply", and the "Stack" box now has a rectangle at the bottom labeled "main()"]
+
+So, if we run this-- well, I should back up a step, sorry. So, the call stack is, basically, it's a data structure which records, basically, where in the program we are. So if we step into a function, we push something onto the stack; if we return from a function, we pop off the top of the stack. That's all the stack can do. We push stuff on the top, pop off the top.
+
+So if you run this file, there's kind of a "main" function, right, like the file itself, so, we push that onto the stack. Then we have some function definitions, they're just, like, defining the state of the world, and finally we got to printSquare. Right? So, printSquare is a function call, so we push that on to the stack.
+
+[5:33. Same slide, now with function printSquare highlighted and indicted by the arrow. The "Stack" now has "main()" on the bottom, and above that, "printSquare()"]
+
+and immediately inside printSquare, push on to the stack, which calls multiply, now we have a return statement, we multiply A and B and we return, when we return we pop something off the stack, so, pop, multiplier of the stack, returning to square, return to print square, console.log, there's no return, it's implicit, because we got to the end of the function, and we're done so that's like a visualization of the call stalk, does that make sense?  (Yes, Phil) 
 
 even if you haven't thought about the call stack before, you've come across it when you've been doing browser‑side development, so if we have code like this, a function baz which calls bar, which calls Foo, which throws an error if we run it in Chrome, we see this. And it prints the stack trace, right, the state of the stack when that error happened, so, uncaught error oops Foo, bar, Baz, anonymous function, which is our main. 
 
