@@ -111,16 +111,31 @@ And now we hit a return statement, right? We multiply A and B and we return. Whe
 
 [5:47. At "pop!", the slide changes. The top item from the stack, "multiply(n,n)", vanishes. The blue box around the code for function multiply also vanishes. The arrow of execution moves to the blue box for function square.]
 
-Pop multiply off the stack, returning to square, 
+Pop multiply off the stack, returning to square.
 
 [5:50. Yellow rectangle labeled "square(n)" vanishes from top of stack. Blue box around code for function square vanishes. Arrow moves down to the blue box around printSquare.]
 
-return to print square, console.log, there's no return, it's implicit, because we got to the end of the function, and we're done.
+Returning to printSquare.
 
+[5:51. Yellow box added to top of stack, so from top to bottom it now has "console.log(squared)", "printSquare(4)", "main()"]
 
-so that's like a visualization of the call stalk, does that make sense?  (Yes, Phil) 
+Console dot log.
 
-even if you haven't thought about the call stack before, you've come across it when you've been doing browser‑side development, so if we have code like this, a function baz which calls bar, which calls Foo, which throws an error if we run it in Chrome, we see this. And it prints the stack trace, right, the state of the stack when that error happened, so, uncaught error oops Foo, bar, Baz, anonymous function, which is our main. 
+[5:55. Top yellow box labeled "console.log(squared)" vanished from top of stack, so from top to bottom it now has "printSquare(4)", "main()"]
+
+Ah, printSquare is now... there's no return, but it's implicit, because we got to the end of the function, 
+
+[5:59. Yellow rectangle labeled "printSquare(4)" vanishes from stack. Promptly followed by the yellow rectangle for "main()" vanishing as well. The slide is now back to its original condition: no blue boxes around function definitions, no yellow rectangles in the empty stack box. Also no more black execution arrow.]
+
+and we're done. Right?
+
+So that is like a visualization of the call stack, does that make sense? [in a pretend falsetto voice: Yes, Phil!] Okay, great.
+
+[6:07. New slide titled "Call Stack" with code for three simple function defintions and one function call.]
+
+So, even if you haven't thought about the call stack before, you've come across it when you've been doing browser‑side development, so if we have code like this, a function baz which calls bar, which calls foo, which throws an error if we run it in Chrome, we see this. 
+
+And it prints the stack trace, right, the state of the stack when that error happened, so, uncaught error oops Foo, bar, Baz, anonymous function, which is our main. 
 
 Equally, if you've heard the term like blowing the stack, this is an example of that. Have a function foo which calls Foo, so, what's going to happen? We  have a function main which calls foo which calls foo, which calls foo, which calls foo, and ultimately chrome says, you probably didn't mean to call foo 16,000 times recursively, I'll just kill things for you and you can figure out where your bug lies, right. So although I may be representing a new side of the call stack you have some sense of it in your development practice already.
 
