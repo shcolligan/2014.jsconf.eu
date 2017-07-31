@@ -91,13 +91,34 @@ So, let's try and visualize that, just to get our heads around what that means. 
 
 [4:58. Slide. An arrow now points to the first function, "multiply", and the "Stack" box now has a rectangle at the bottom labeled "main()"]
 
-So, if we run this-- well, I should back up a step, sorry. So, the call stack is, basically, it's a data structure which records, basically, where in the program we are. So if we step into a function, we push something onto the stack; if we return from a function, we pop off the top of the stack. That's all the stack can do. We push stuff on the top, pop off the top.
+So, if we run this-- well, I should back up a step, sorry. So, the call stack is, basically, it's a data structure, which records, basically, where in the program we are. So if we step into a function, we push something onto the stack; if we return from a function, we pop off the top of the stack. That's all the stack can do. We push stuff on the top, pop off the top.
 
-So if you run this file, there's kind of a "main" function, right, like the file itself, so, we push that onto the stack. Then we have some function definitions, they're just, like, defining the state of the world, and finally we got to printSquare. Right? So, printSquare is a function call, so we push that on to the stack.
+[Slide: The "Stack" box gains a yellow rectangle labeled "main()" on the bottom. The arrow moves from top to bottom of the code sample, as if reading the code.]
 
-[5:33. Same slide, now with function printSquare highlighted and indicted by the arrow. The "Stack" now has "main()" on the bottom, and above that, "printSquare()"]
+So if you run this file, there's kind of a "main" function, right, like, the file itself, so we push that onto the stack. Then we have some function definitions, they're just, like, defining the state of the world, and finally we get to printSquare. Right? So, printSquare is a function call, so we push that onto the stack.
 
-and immediately inside printSquare, push on to the stack, which calls multiply, now we have a return statement, we multiply A and B and we return, when we return we pop something off the stack, so, pop, multiplier of the stack, returning to square, return to print square, console.log, there's no return, it's implicit, because we got to the end of the function, and we're done so that's like a visualization of the call stalk, does that make sense?  (Yes, Phil) 
+[5:33. Same slide, now with function printSquare highlighted in a blue box, and indicted by the arrow. The "Stack" box now contains a yellow rectangle labeled "main()" on the bottom, and above that, another yellow rectangle labeled "printSquare(4)".]
+
+And immediately inside printSquare we're gonna call square(), push onto the stack, 
+
+[5:36. Same slide, now with the code for function square highlighted in another blue box, the same as that for printSquare. The arrow indicates the blue box around square. The stack box now contains three yellow rectangles: "main()" on the bottom, then "printSquare(4)" above, then "square(n)" on top.]
+
+which calls multiply.
+
+[5:38. Now the code for multiply has a blue box too, so there are three blue boxes on the left, one for each function definition. The arrow indicates the box for multiply. The stack now has four yellow rectangles, from top to bottom: "multiply(n,n)", "square(n)", "printSquare(4)", "main()".
+
+And now we hit a return statement, right? We multiply A and B and we return. When we return, we pop something off the stack, so, pop!
+
+[5:47. At "pop!", the slide changes. The top item from the stack, "multiply(n,n)", vanishes. The blue box around the code for function multiply also vanishes. The arrow of execution moves to the blue box for function square.]
+
+Pop multiply off the stack, returning to square, 
+
+[5:50. Yellow rectangle labeled "square(n)" vanishes from top of stack. Blue box around code for function square vanishes. Arrow moves down to the blue box around printSquare.]
+
+return to print square, console.log, there's no return, it's implicit, because we got to the end of the function, and we're done.
+
+
+so that's like a visualization of the call stalk, does that make sense?  (Yes, Phil) 
 
 even if you haven't thought about the call stack before, you've come across it when you've been doing browser‑side development, so if we have code like this, a function baz which calls bar, which calls Foo, which throws an error if we run it in Chrome, we see this. And it prints the stack trace, right, the state of the stack when that error happened, so, uncaught error oops Foo, bar, Baz, anonymous function, which is our main. 
 
