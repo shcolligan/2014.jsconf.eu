@@ -12,7 +12,7 @@ So, first up, as he said, I work for AndYet which is an awesome little dev shop 
 
 [slide: "How does JavaScript even work?"]
 
-So, about 18 months ago, I'm a paid [airquotes] professional JavaScript developer. I thought to myself, how does JavaScript actually work?  And I wasn't entirely sure.  I'd heard "V8" as a term, Chrome's "runtime", didn't really know what that meant, what that did.  I'd heard things like "single threaded", you know, obviously, I'm using "callbacks". How do callbacks work? I started a journey of reading and research and experimenting in the browser which basically started like this:
+So, about 18 months ago, I'm a paid [airquotes] professional JavaScript developer. I thought to myself, how does JavaScript actually work?  And I wasn't entirely sure.  I'd heard "v8" as a term, Chrome's "runtime", didn't really know what that meant, what that did.  I'd heard things like "single threaded", you know, obviously, I'm using "callbacks". How do callbacks work? I started a journey of reading and research and experimenting in the browser which basically started like this:
 
 [series of slides of txted conversation between icons of Phil and JS. Phil: "What are you"].  
 
@@ -30,15 +30,35 @@ Right. That's uh... yeah. Cool.
 
 [rapid rattling off list on slide] I have a call stack, an event loop, a callback queue, and some other APIs and stuff.
 
+[1:44]
+
 Right. 
 
-I did not do a computer science degree.  I mean, these words, they're [just] words. 
+I did not do a computer science degree.  I mean, these words? They're [just] words. 
 
-[series of slides of txted conversation between icons of Phil and V8.].  
+[1:48. Series of slides of txted conversation between icons of Phil and v8. Phil: "Hey v8, do you have a call stack, an event loop, a callback queue, some other APIs, and stuff?"].  
 
-So, I heard about V8, and the various runtimes, and different browsers, so I looked to V8 do you have a call stack, an event loop, a callback queue, and some other APIs and stuff, I have a call stack and a heap, I don't know what those other things are, okay, interesting so basically 18 months passed. And I think I get this. (Laughing) and so, this is what I want to share with you today. Hopefully this will be useful if you're relatively new to JavaScript, help you understand why JavaScript is so weird when you compare it to other languages you might used, why callbacks are a thing, cause us hell, but are required. And if you're an experienced JavaScript developer hopefully give you some fresh insights how the Runtime you're using works so you can think about it a little better. 
+So, I heard about v8, and the various runtimes in different browsers, so I looked to V8 and said, "Do you have a call stack, an event loop, a callback queue, and some other APIs and stuff?"
 
-So if we look at the JavaScript Runtime itself like V8 which is the Runtime inside Chrome. This is a simplified view of what JavaScript Runtime is. The heap, where memory allocation happens, and then there's the call stack, which is where your stack frames are and all that kind of stuff, but, if you, like, clone the V8 code base and grep for things like setTimeout or DOM or HTTP request, they're not in there, they don't exist in V8, which was a surprise to me. It's first thing you use when you start thinking about async stuff and it's not in the V8 source. Hmm ... interesting. So, over this 18 months of discovery I come to realize this is really, this is really the bigger picture, this is what I'm hoping to get you on board with today and understand what these pieces are, we have the V8 Runtime but then we have these things called web APIs which are extra things that the browser provides. DOM, AJAX, time out, things like that, we have this mythical event loop and the callback queue. I'm sure you've heard some of these terms before, but maybe you don't quite understand how these pieces pull together. So, I'm going to start from the beginning, some of this will be new, to words might be new to people, other people will get this. We're going to quickly move on from here, bear with me if this is obvious, I think for a lot of people it's not. 
+[1:58. Slide: v8: "I have a call stack and a heap. WTF are those other things?"]
+
+"I have a call stack and a heap. I don't know what those other things are." 
+
+[2:04. Slide: Phil: "Hm..."]
+
+Okay, interesting. 
+
+[2:06. Slide. "18 months later..."]
+
+So, basically, 18 months pass. We're 18 months later now. And I think, I think I get this. 
+
+[2:12. Slide. "I think I get this!" with image of Phil with rainbow lasers of comprehension shooting from his eyes.]
+
+And so, this is what I want to share with you today. Hopefully this will be useful if you're relatively new to JavaScript, help you understand why JavaScript is so weird when you compare it to other languages you might used, why callbacks are a thing, cause us hell, but are required. And also if you're an experienced JavaScript developer, hopefully give you some fresh insights how the runtime you're using works so you can think about it a little better. 
+
+[2:40. Slide: Diagram of JS. Left side labeled "heap", consisting of random squares "memory allocation", right side labeled "stack", consisting of neatly stacked rectangles labeled "execution contexts".
+
+So if we look at the JavaScript Runtime itself like v8 which is the Runtime inside Chrome. This is a simplified view of what JavaScript Runtime is. The heap, where memory allocation happens, and then there's the call stack, which is where your stack frames are and all that kind of stuff, but, if you, like, clone the V8 code base and grep for things like setTimeout or DOM or HTTP request, they're not in there, they don't exist in V8, which was a surprise to me. It's first thing you use when you start thinking about async stuff and it's not in the V8 source. Hmm ... interesting. So, over this 18 months of discovery I come to realize this is really, this is really the bigger picture, this is what I'm hoping to get you on board with today and understand what these pieces are, we have the V8 Runtime but then we have these things called web APIs which are extra things that the browser provides. DOM, AJAX, time out, things like that, we have this mythical event loop and the callback queue. I'm sure you've heard some of these terms before, but maybe you don't quite understand how these pieces pull together. So, I'm going to start from the beginning, some of this will be new, to words might be new to people, other people will get this. We're going to quickly move on from here, bear with me if this is obvious, I think for a lot of people it's not. 
 
 So, JavaScript is a single threaded programming language, single threaded Runtime, it has a single call stack. And it can do one thing at a time, that's what a single thread means, the program can run one piece of code at a time. So, let's try and visualize that just to get our heads around what that mean, so if I have some code like this on your left, we've got a few functions, a function "multiplier" which multiplies two numbers, "square" which calls "multiply" with the same number twice, a function which prints the square of a number of calling square and then calling console.log and then at the bottom of our file we actually run print square, this code all good?  Make sense?  Cool. 
 
