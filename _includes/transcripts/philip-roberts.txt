@@ -58,7 +58,7 @@ And so, this is what I want to share with you today. Hopefully this will be usef
 
 [2:40. Slide: Diagram of a rectangle labeled "JS". Left side labeled "heap", consisting of random squares of "memory allocation", right side labeled "stack", consisting of neatly stacked rectangles labeled "execution contexts".]
 
-So, if we look at the JavaScript runtime itself-- like v8, for example, which is the runtime inside Chrome-- this is a simplified view of what the JavaScript runtime is. It's a heap, which is really boring, we don't need to worry about that, it's where memory allocation happens; and then there's the call stack, which is where your stack frames are and all that kind of stuff. But, if you, like, clone the v8 code base, and grep for things like setTimeout or DOM or XMLHttpRequest, they're not in there. They don't exist in v8. Which was kinda of a surprise to me, right? Like, setTimeout is one of those first things you use when you start thinking about async stuff. And it's not in the V8 source??? Hmm ... interesting. 
+So, if we look at the JavaScript runtime itself-- like v8, for example, which is the runtime inside Chrome-- this is a simplified view of what the JavaScript runtime is. It's a heap, which is really boring, we don't need to worry about that, it's where memory allocation happens; and then there's the call stack, which is where your stack frames are and all that kind of stuff. But, if you, like, clone the v8 code base, and grep for things like setTimeout or DOM or XMLHttpRequest, they're not in there. They don't exist in v8. Which was kinda of a surprise to me, right? Like, setTimeout is one of those first things you use when you start thinking about async stuff. And it's not in the v8 source??? Hmm ... interesting. 
 
 [3:29. Slide: Same JS rectangle, now inside larger rectangle labeled with Chrome icon, and joined now by things labeled WebAPIs, Event Loop, and Callback Queue. Under "WebAPIs" are three rectangles labeled "DOM (document), "ajax (XMLHttpRequest)", "setTimeout".]
 
@@ -165,9 +165,13 @@ Equally, if you've heard the term "blowing the stack", this is an example of tha
 
 [6:59. Slide: Stack of yellow rectangles labeled foo() going off top of screen; big error message stamped across the screen, "RangeError: Maximum call stack size exceeded"]
 
-and ultimately Chrome says, well, hm, you probably didn't mean to call foo sixteen thousand times recursively, so I'll just kill things for you, and you can figure out where your bug lies. Right? So although I may be representing a new side of the call stack, you have some sense of it in your development practice already.
+and ultimately Chrome says, "Well, hm, you probably didn't mean to call foo sixteen thousand times recursively, so I'll just kill things for you, and you can figure out where your bug lies." Right? So although I may be representing a new side of the call stack, you have some sense of it in your development practice already.
 
-So, the big question then comes is like what happens when things are slow?  So, we talk about blocking and blocking behavior and blocking, there's no strict definition of what is and didn't blocking, really it's just code that's slow. So console.log isn't slow, doing a while loop from one to ten billion is slow, network requests are slow. Image requests are slow. Things which are slow and on that stack are what are blocking means. 
+[7:19. Slide: "Blocking. What happens when things are slow?"]
+
+So, the big question then that comes is, what happens when things are slow?  So, we talk about blocking and blocking behavior. There's no strict definition of what is and isn't blocking, really it's just, "code that is slow." So, console.log is not very slow. Doing a while loop from one to ten billion is kind of slow. Doing image processing is slow. Network requests are slow. Things which are slow and on that stack are what blocking means. 
+
+[7:51. Slide, titled "Call Stack".] 
 
 So here's a little example. Let's say we have, this is like a fake bit of code, getSynchronous, right, like, jQuery is like, AJAX request. What would happen if those were synchronous requests, forget what we know about async callbacks, they're synchronous. If we go through it like we have, we call getSync and then we wait, because then we're doing network request, network is, relative to computers, are slow, hopefully that network requests completes, we can move on, wait, move on. Wait, and, I mean, this network request might never finish, so ... yeah, I guess I'll go home. Finally those three, you know, blocking behaviors complete and we can clear the stack, right. 
 
