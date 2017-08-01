@@ -133,11 +133,39 @@ So that is like a visualization of the call stack, does that make sense? [in a p
 
 [6:07. New slide titled "Call Stack" with code for three simple function defintions and one function call.]
 
-So, even if you haven't thought about the call stack before, you've come across it when you've been doing browser‑side development, so if we have code like this, a function baz which calls bar, which calls foo, which throws an error if we run it in Chrome, we see this. 
+function foo() {
+  throw new Error('Oops!');
+}
 
-And it prints the stack trace, right, the state of the stack when that error happened, so, uncaught error oops Foo, bar, Baz, anonymous function, which is our main. 
+function bar() {
+  foo();
+}
 
-Equally, if you've heard the term like blowing the stack, this is an example of that. Have a function foo which calls Foo, so, what's going to happen? We  have a function main which calls foo which calls foo, which calls foo, which calls foo, and ultimately chrome says, you probably didn't mean to call foo 16,000 times recursively, I'll just kill things for you and you can figure out where your bug lies, right. So although I may be representing a new side of the call stack you have some sense of it in your development practice already.
+function baz() {
+  bar();
+}
+
+baz();
+
+So, even if you haven't thought about or visualized the call stack before, you've undoubtedly come across it when you've been doing, certainly, browser‑side development, so if we have code like this, a function baz which calls bar which calls foo, which throws an error,
+
+[6:22. Same slide, plus a little window showing a (Chrome DevTools Console) error message. Five lines from top to bottom read: "Uncaught Error: Oops!", "foo", "bar", "baz", "(anonymous function)".
+
+then if we run it in Chrome, we see something like this in the DevTools, right? "Uncaught Error: Oops!" And it prints the stack trace. That is the stack trace, right? The state of the stack when that error happened. So, "Uncaught Error: Oops!", which was called in foo, which was called by bar, which was called by baz, which was called by this anonymous function, which is our main. Right?
+
+[6:41. New slide, titled "Call Stack."]
+
+function foo() {
+  return foo();
+}
+
+foo();
+
+Equally, if you've heard the term "blowing the stack", this is an example of that. Have a function foo which calls foo. So, what's going to happen? We have a function main which calls foo which calls foo, which calls foo, which calls foo, 
+
+[6:59. Slide: Stack of yellow rectangles labeled foo() going off top of screen; big error message stamped across the screen, "RangeError: Maximum call stack size exceeded"]
+
+and ultimately Chrome says, well, hm, you probably didn't mean to call foo sixteen thousand times recursively, so I'll just kill things for you, and you can figure out where your bug lies. Right? So although I may be representing a new side of the call stack, you have some sense of it in your development practice already.
 
 So, the big question then comes is like what happens when things are slow?  So, we talk about blocking and blocking behavior and blocking, there's no strict definition of what is and didn't blocking, really it's just code that's slow. So console.log isn't slow, doing a while loop from one to ten billion is slow, network requests are slow. Image requests are slow. Things which are slow and on that stack are what are blocking means. 
 
